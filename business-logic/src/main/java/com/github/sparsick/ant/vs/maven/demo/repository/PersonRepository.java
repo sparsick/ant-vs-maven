@@ -2,7 +2,6 @@ package com.github.sparsick.ant.vs.maven.demo.repository;
 
 import com.github.sparsick.ant.vs.maven.demo.domain.Person;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -10,7 +9,6 @@ import javax.sql.DataSource;
 import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 
 @Repository
 public class PersonRepository {
@@ -30,17 +28,12 @@ public class PersonRepository {
 
 
     public List<Person> findAllPersons() {
-        return jdbcTemplate.query("Select * from person;", new RowMapper<Person>() {
-
-            @Override
-            public Person mapRow(ResultSet resultSet, int arg1) throws SQLException {
-                Person person = new Person();
-                person.setFirstName(resultSet.getString("first_name"));
-                person.setLastName(resultSet.getString("last_name"));
-                person.setJobTitle(resultSet.getString("job_title"));
-                return person;
-            }
-
+        return jdbcTemplate.query("Select * from person;", (ResultSet resultSet, int index) -> {
+            Person person = new Person();
+            person.setFirstName(resultSet.getString("first_name"));
+            person.setLastName(resultSet.getString("last_name"));
+            person.setJobTitle(resultSet.getString("job_title"));
+            return person;
         });
 
     }
