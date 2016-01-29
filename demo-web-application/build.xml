@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="demo-web-application" basedir="." default="package">
+    
+    <property file="../build.properties"/>
+    
+    
+    <path id="lib-classpath">
+        <fileset dir="${basedir}/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac destdir="${build.dir}/classes">
+            <src path="${src.dir}"/>
+            <classpath refid="lib-classpath"/>
+        </javac>
+        <copy todir="${build.dir}/classes">
+            <fileset dir="${resource.dir}"/>
+        </copy>
+    </target>
+    
+    
+    
+    <target name="compile.test" depends="compile">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac destdir="${build.dir}/test-classes">
+            <src path="${test.dir}"/>
+            <classpath refid="lib-classpath"/>
+            <classpath location="${build.dir}/classes"/>
+        </javac>
+    </target>
+    
+    
+    <target name="test" depends="compile.test">
+        <mkdir dir="${build.dir}/surefire-reports"/>
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement location="${build.dir}/test-classes"/>
+                <pathelement location="${build.dir}/classes"/>
+                <path refid="lib-classpath" />
+            </classpath>
+            
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+            
+            <batchtest fork="yes" todir="${build.dir}/surefire-reports">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    
+    <target name="package" depends="test">
+        <war destfile="${build.dir}/${ant.project.name}.war" >
+            <fileset dir="src/main/webapp"/>
+                      
+            <lib dir= "lib"/>  
+            
+            <classes dir="${build.dir}/classes" />
+        </war>
+    </target>
+
+</project>

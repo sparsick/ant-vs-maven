@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="business-logic" basedir="." default="package">
+    
+    <property file="../build.properties"/>
+    
+    
+    <path id="lib-classpath">
+        <fileset dir="${basedir}/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac destdir="${build.dir}/classes">
+            <src path="${src.dir}"/>
+            <classpath refid="lib-classpath"/>
+        </javac>
+        <copy todir="${build.dir}/classes">
+            <fileset dir="${resource.dir}"/>
+        </copy>
+    </target>
+    
+    <target name="tests.dir.check">
+        <condition property="tests.exists">
+            <available file="${test.dir}" type="dir" />
+        </condition>
+    </target>
+    
+    <target name="compile.test" depends="compile,tests.dir.check" if="tests.exists">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac destdir="${build.dir}/test-classes">
+            <src path="${test.dir}"/>
+            <classpath refid="lib-classpath"/>
+            <classpath location="${build.dir}/classes"/>
+        </javac>
+    </target>
+    
+    
+    <target name="test" depends="compile.test,tests.dir.check" if="tests.exists">
+        <mkdir dir="${build.dir}/surefire-reports"/>
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement location="${build.dir}/test-classes"/>
+                <pathelement location="${build.dir}/classes"/>
+                <path refid="lib-classpath" />
+            </classpath>
+            
+            <formatter type="plain"/>
+            <formatter type="xml"/>
+            
+            <batchtest fork="yes" todir="${build.dir}/surefire-reports">
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+    
+    <target name="package" depends="test">
+        <jar destfile="${build.dir}/${ant.project.name}.jar" basedir="${build.dir}/classes">
+        </jar>
+    </target>
+
+</project>

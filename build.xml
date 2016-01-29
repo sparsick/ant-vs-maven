@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-vs-maven" default="package">
+    
+    <target name="clean">
+        <subant target="clean">
+            <fileset dir="." includes="*/build.xml"/>
+        </subant>
+    </target>
+    
+    <target name="package">
+        <subant target="package">
+            <fileset dir="." includes="*/build.xml"/>
+        </subant>
+    </target>
+    
+
+    
+   
+
+</project>
